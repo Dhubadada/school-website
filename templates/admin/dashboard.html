@@ -1,0 +1,140 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold mb-8 text-gray-800">Admin Dashboard</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Teachers Card -->
+        <div class="bg-blue-100 p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-800">Teachers</h3>
+                    <p class="text-3xl font-bold text-blue-600">{{ teachers_count }}</p>
+                </div>
+                <i class="fas fa-chalkboard-teacher text-blue-500 text-4xl"></i>
+            </div>
+            <a href="{{ url_for('admin_teachers') }}" class="mt-4 inline-block text-blue-600 hover:underline">View All</a>
+        </div>
+        
+        <!-- Admissions Card -->
+        <div class="bg-green-100 p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-green-800">Admissions</h3>
+                    <p class="text-3xl font-bold text-green-600">{{ admissions_count }}</p>
+                    <p class="text-sm text-green-700">{{ pending_admissions }} pending</p>
+                </div>
+                <i class="fas fa-user-graduate text-green-500 text-4xl"></i>
+            </div>
+            <a href="{{ url_for('admin_admissions') }}" class="mt-4 inline-block text-green-600 hover:underline">View All</a>
+        </div>
+        
+        <!-- Messages Card -->
+        <div class="bg-yellow-100 p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-yellow-800">Messages</h3>
+                    <p class="text-3xl font-bold text-yellow-600">{{ messages_count }}</p>
+                    <p class="text-sm text-yellow-700">{{ unread_messages }} unread</p>
+                </div>
+                <i class="fas fa-envelope text-yellow-500 text-4xl"></i>
+            </div>
+            <a href="{{ url_for('admin_messages') }}" class="mt-4 inline-block text-yellow-600 hover:underline">View All</a>
+        </div>
+        
+        <!-- News Card -->
+        <div class="bg-purple-100 p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-purple-800">News</h3>
+                    <p class="text-3xl font-bold text-purple-600">{{ news_count }}</p>
+                </div>
+                <i class="fas fa-newspaper text-purple-500 text-4xl"></i>
+            </div>
+            <a href="{{ url_for('admin_news') }}" class="mt-4 inline-block text-purple-600 hover:underline">View All</a>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h3 class="text-xl font-semibold mb-4 text-gray-800">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{{ url_for('admin_teachers') }}" class="bg-blue-50 hover:bg-blue-100 text-blue-800 p-4 rounded-lg flex items-center">
+                <i class="fas fa-plus-circle mr-2"></i> Add Teacher
+            </a>
+            <a href="{{ url_for('admin_news') }}" class="bg-purple-50 hover:bg-purple-100 text-purple-800 p-4 rounded-lg flex items-center">
+                <i class="fas fa-plus-circle mr-2"></i> Add News
+            </a>
+            <a href="{{ url_for('admin_admissions') }}" class="bg-green-50 hover:bg-green-100 text-green-800 p-4 rounded-lg flex items-center">
+                <i class="fas fa-list mr-2"></i> View Admissions
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics Charts -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h3 class="text-xl font-semibold mb-4 text-gray-800">Statistics</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <canvas id="admissionsChart"></canvas>
+            </div>
+            <div>
+                <canvas id="messagesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Admissions Status Chart
+    const admissionsCtx = document.getElementById('admissionsChart').getContext('2d');
+    const admissionsChart = new Chart(admissionsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Approved', 'Pending', 'Rejected'],
+            datasets: [{
+                data: [{{ admissions_count - pending_admissions }}, {{ pending_admissions }}, 0],
+                backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                title: {
+                    display: true,
+                    text: 'Admissions Status',
+                    font: { size: 16 }
+                }
+            }
+        }
+    });
+
+    // Messages Status Chart
+    const messagesCtx = document.getElementById('messagesChart').getContext('2d');
+    const messagesChart = new Chart(messagesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Read', 'Unread'],
+            datasets: [{
+                data: [{{ messages_count - unread_messages }}, {{ unread_messages }}],
+                backgroundColor: ['#3B82F6', '#F59E0B'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                title: {
+                    display: true,
+                    text: 'Messages Status',
+                    font: { size: 16 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
